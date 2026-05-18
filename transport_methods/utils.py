@@ -3,12 +3,12 @@ import pandas as pd
 
 
 def costo_total(x: np.ndarray, costos: np.ndarray) -> float:
-    """Calcula el costo total de transporte dado una asignación x."""
+    """Calculate the total transportation cost given an allocation x."""
     return float((x * costos).sum())
 
 
 def mostrar_tabla(x: np.ndarray, costos: np.ndarray, titulo: str = "Asignación") -> None:
-    """Imprime la tabla de asignación con su costo total."""
+    """Print the allocation table with its total cost."""
     m, n = x.shape
     df = pd.DataFrame(
         x.astype(int),
@@ -21,15 +21,12 @@ def mostrar_tabla(x: np.ndarray, costos: np.ndarray, titulo: str = "Asignación"
 
 
 def mostrar_resumen(resultados: dict) -> None:
-    """
-    Imprime el resumen comparativo de todos los métodos.
-    resultados = {"Nombre método": costo, ...}
-    """
+    """ Print a comparative summary of all methods. results = {"Method name": cost, ...} """
     print("\n" + "=" * 60)
-    print("   RESUMEN COMPARATIVO DE MÉTODOS")
+    print("   RESUMEN COMPARATIVO DE METODOS")
     print("=" * 60)
     costos_vals = list(resultados.values())
     minimo      = min(costos_vals)
     for nombre, costo in resultados.items():
-        marca = "  ◄ ÓPTIMO" if costo == minimo else ""
+        marca = "  OPTIMO" if costo == minimo else ""
         print(f"  {nombre:<30}: {costo:.2f}{marca}")

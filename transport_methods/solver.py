@@ -3,10 +3,7 @@ from itertools import product
 
 
 class SteppingStoneSolver:
-    """
-    Optimizador por el método Stepping Stone.
-    Recibe una solución inicial y la lleva al óptimo.
-    """
+    """Stepping Stone Optimizer. It takes an initial solution and steps it down to the optimum. """
 
     def __init__(self, costos: np.ndarray, verbose: bool = True):
         self.costos  = costos
@@ -14,25 +11,22 @@ class SteppingStoneSolver:
         self.m, self.n = costos.shape
 
     def resolver(self, x_inicial: np.ndarray):
-        """
-        Optimiza la asignación x_inicial.
-        Retorna (x_optima, historial)
-        """
-        x         = x_inicial.copy().astype(float)
+        """ Optimizes the initial x_allocation. Returns (optimal x, history) """
+        x = x_inicial.copy().astype(float)
         historial = []
 
         if self.verbose:
             print("\n" + "=" * 60)
-            print("   ALGORITMO STEPPING STONE — OPTIMIZACIÓN")
+            print("   ALGORITMO STEPPING STONE — OPTIMIZACION")
             print("=" * 60)
 
         for iteracion in range(1, 100):
             costo_actual = self._costo_total(x)
-            reducidos    = self._calcular_costos_reducidos(x)
+            reducidos = self._calcular_costos_reducidos(x)
 
             if self.verbose:
-                print(f"\n--- Iteración {iteracion} | Costo actual: {costo_actual:.2f} ---")
-                print("Costos reducidos (celdas no básicas):")
+                print(f"\n--- Iteracion {iteracion} | Costo actual: {costo_actual:.2f} ---")
+                print("Costos reducidos (celdas no basicas):")
                 for (i, j), val in sorted(reducidos.items()):
                     marca = "✓" if val >= 0 else "↓ "
                     print(f"  Δc({i+1},{j+1}) = {val:+.4f}  {marca}")
@@ -46,7 +40,7 @@ class SteppingStoneSolver:
             negativos = {k: v for k, v in reducidos.items() if v < -1e-9}
             if not negativos:
                 if self.verbose:
-                    print("\n✔ SOLUCIÓN ÓPTIMA ALCANZADA — todos los Δc ≥ 0")
+                    print("\n SOLUCION OPTIMA ALCANZADA — todos los Δc ≥ 0")
                 break
 
             entrante = min(negativos, key=negativos.get)
