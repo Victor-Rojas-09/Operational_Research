@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .utils import costo_total
+from ui.utils import costo_total
 
 def graficar_historial(historial: list) -> None:
     """Graph the convergence of the cost over the iterations."""
