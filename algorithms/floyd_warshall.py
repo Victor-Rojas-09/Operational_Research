@@ -64,21 +64,21 @@ def floyd_warshall(number_of_nodes, weighted_edges):
 # Example Usage
 # ------------------------------------------------------
 
-graph_edges = [
-    (0, 1, 3),
-    (0, 2, 8),
-    (1, 2, 2),
-    (1, 3, 5),
-    (2, 3, 1),
-    (3, 0, 2)
-]
+if __name__ == "__main__":
+    graph_edges = [
+        (0, 1, 3),
+        (0, 2, 8),
+        (1, 2, 2),
+        (1, 3, 5),
+        (2, 3, 1),
+        (3, 0, 2),
+    ]
 
-distance_matrix = floyd_warshall(
-    number_of_nodes=4,
-    weighted_edges=graph_edges
-)
+    distance_matrix = floyd_warshall(
+        number_of_nodes=4,
+        weighted_edges=graph_edges
+    )
 
-print("Shortest Distance Matrix:\n")
-
-for row in distance_matrix:
-    print(row)
+    print("Shortest Distance Matrix:\n")
+    for row in distance_matrix:
+        print(row)
