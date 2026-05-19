@@ -1,9 +1,9 @@
 import pandas as pd
 from transport_methods import (
     ingresar_problema,
-    EsquinaNoroeste,
-    CostoMinimo,
-    Vogel,
+    NorthWestCorner,
+    MinimumCostMethod,
+    VogelApproximation,
     SteppingStoneSolver,
     costo_total,
     mostrar_tabla,
@@ -33,9 +33,9 @@ def pedir_opcion(opciones: list[str], prompt: str = "Elige una opción") -> int:
             print("  Entrada invalida, intenta de nuevo.")
 
 METODOS_INICIALES = {
-    "Esquina Noroeste": EsquinaNoroeste,
-    "Costo Mínimo":     CostoMinimo,
-    "Vogel":            Vogel,
+    "NorthWestCorner": NorthWestCorner,
+    "Costo Mínimo":     MinimumCostMethod,
+    "VogelApproximation":            VogelApproximation,
 }
 
 

@@ -1,100 +1,132 @@
 import numpy as np
 
-class EsquinaNoroeste:
+class NorthWestCorner:
     """Northwest Corner Method for initial solution."""
     @staticmethod
     def resolver(costos: np.ndarray, oferta: np.ndarray, demanda: np.ndarray) -> np.ndarray:
-        m, n = costos.shape
-        x = np.zeros((m, n))
-        o = oferta.copy()
-        d = demanda.copy()
-        i, j = 0, 0
+        rows, cols = costos.shape
+        allocation = np.zeros((rows, cols))
+        supply = oferta.copy()
+        demand = demanda.copy()
+        costs = costos.copy()
+        row, column = 0, 0
 
-        while i < m and j < n:
-            asig = min(o[i], d[j])
-            x[i, j] = asig
-            o[i] -= asig
-            d[j] -= asig
-            if np.isclose(o[i], 0) and np.isclose(d[j], 0):
-                if i + 1 < m:
-                    i += 1
+        # Traverse the matrix starting from the upper-left corner
+        while row < rows and column < cols:
+            assigned = min(supply[row], demand[column])
+            allocation[row, column] = assigned
+
+            # Reduce supply and demand
+            supply[row] -= assigned
+            demand[column] -= assigned
+
+            # Move according to which value is exhausted
+            if np.isclose(supply[row], 0) and np.isclose(demand[column], 0):
+                if row + 1 < rows:
+                    row += 1
                 else:
-                    j += 1
-            elif np.isclose(o[i], 0):
-                i += 1
+                    column += 1
+            elif np.isclose(supply[row], 0):
+                row += 1
             else:
-                j += 1
-        return x
+                column += 1
+        return allocation
 
-class CostoMinimo:
+class MinimumCostMethod:
     """Minimum Cost Method for initial solution."""
     @staticmethod
     def resolver(costos: np.ndarray, oferta: np.ndarray, demanda: np.ndarray) -> np.ndarray:
-        m, n = costos.shape
-        x = np.zeros((m, n))
-        o = oferta.copy()
-        d = demanda.copy()
-        c = costos.copy()
+        rows, cols = costos.shape
+        allocation = np.zeros((rows, cols))
+        supply = oferta.copy()
+        demand = demanda.copy()
+        costs = costos.copy()
 
-        while o.sum() > 1e-9 and d.sum() > 1e-9:
-            mascara = c < np.inf
-            if not mascara.any():
+        # Continue while there is remaining supply and demand
+        while supply.sum() > 1e-9 and demand.sum() > 1e-9:
+            # Select the available cell with the minimum cost
+            mask = (costs < np.inf)
+
+            if not mask.any():
                 break
-            idx = np.unravel_index(np.where(mascara, c, np.inf).argmin(), c.shape)
-            i, j = idx
-            asig = min(o[i], d[j])
-            x[i, j] = asig
-            o[i] -= asig
-            d[j] -= asig
-            if np.isclose(o[i], 0):
-                c[i, :] = np.inf
-            if np.isclose(d[j], 0):
-                c[:, j] = np.inf
-        return x
+            row, column = np.unravel_index(np.where(mask, costs, np.inf).argmin(), costs.shape)
+            assigned = min(supply[row], demand[column])
+            allocation[row, column] = assigned
 
-class Vogel:
-    """Vogel's approximation method for initial solution."""
+            # Reduce supply and demand
+            supply[row] -= assigned
+            demand[column] -= assigned
+
+            # Block row if supply is exhausted
+            if np.isclose(supply[row], 0):
+                costs[row, :] = np.inf
+
+            # Block column if demand is exhausted
+            if np.isclose(demand[column], 0):
+                costs[:, column] = np.inf
+        return allocation
+
+class VogelApproximation:
+    """VogelApproximation's approximation method for initial solution."""
     @staticmethod
     def resolver(costos: np.ndarray, oferta: np.ndarray, demanda: np.ndarray) -> np.ndarray:
-        m, n = costos.shape
-        x = np.zeros((m, n))
-        o = oferta.copy()
-        d = demanda.copy()
-        c = costos.copy()
-        fila_activa = [True] * m
-        col_activa = [True] * n
+        rows, cols = costos.shape
+        allocation = np.zeros((rows, cols))
+        supply = oferta.copy()
+        demand = demanda.copy()
+        costs = costos.copy()
+        active_rows = [True] * rows
+        active_cols  = [True] * cols
 
-        def pen_fila(i):
-            vals = sorted(c[i, j] for j in range(n) if col_activa[j])
+        # Functions to compute row and column penalties
+        def row_penalty(row):
+            """
+            Calculate row penalties.
+            """
+            vals = sorted(costs[row, c] for c in range(cols) if active_cols[c])
             return (vals[1] - vals[0]) if len(vals) >= 2 else 0
 
-        def pen_col(j):
-            vals = sorted(c[i, j] for i in range(m) if fila_activa[i])
+        def col_penalty(col):
+            """
+            Calculate column penalties.
+            """
+            vals = sorted(costs[r, col] for r in range(rows) if active_rows[r])
             return (vals[1] - vals[0]) if len(vals) >= 2 else 0
 
-        for _ in range(m + n - 1):
-            if o.sum() < 1e-9 or d.sum() < 1e-9:
+        # # Iterate until supply and demand are exhausted
+        for _ in range(rows + cols - 1):
+            if supply.sum() < 1e-9 or demand.sum() < 1e-9:
                 break
-            pf = [(pen_fila(i), i, 'f') for i in range(m) if fila_activa[i]]
-            pc = [(pen_col(j),  j, 'c') for j in range(n) if col_activa[j]]
-            todas = sorted(pf + pc, reverse=True)
-            if not todas:
+            penalties = (
+                [(row_penalty(r), r, 'row') for r in range(rows) if active_rows[r]] +
+                [(col_penalty(c), c, 'col') for c in range(cols) if active_cols[c]]
+            )
+            if not penalties:
                 break
-            _, sel, tipo = todas[0]
-            if tipo == 'f':
-                i_sel = sel
-                j_sel = min((j for j in range(n) if col_activa[j]),  key=lambda j: c[i_sel, j])
+
+            # Select the highest penalty
+            _, selected, kind = max(penalties, key=lambda x: x[0])
+            
+            if kind == 'row':
+                row = selected
+                column = min((c for c in range(cols) if active_cols[c]), key=lambda c: costs[row, c])
             else:
-                j_sel = sel
-                i_sel = min((i for i in range(m) if fila_activa[i]), key=lambda i: c[i, j_sel])
-            asig = min(o[i_sel], d[j_sel])
-            x[i_sel, j_sel] = asig
-            o[i_sel] -= asig
-            d[j_sel] -= asig
-            if np.isclose(o[i_sel], 0):
-                fila_activa[i_sel] = False
-                c[i_sel, :]        = np.inf
-            if np.isclose(d[j_sel], 0):
-                col_activa[j_sel] = False
-                c[:, j_sel]       = np.inf
-        return x
+                column = selected
+                row = min((r for r in range(rows) if active_rows[r]), key=lambda r: costs[r, column])
+
+            assigned = min(supply[row], demand[column])
+            allocation[row, column] = assigned
+
+            # Reduce supply and demand
+            supply[row] -= assigned
+            demand[column] -= assigned
+
+            # Deactivate exhausted row or column
+            if np.isclose(supply[row], 0):
+                active_rows[row] = False
+                costs[row, :] = np.inf
+
+            if np.isclose(demand[column], 0):
+                active_cols[column] = False
+                costs[:, column] = np.inf
+        return allocation
