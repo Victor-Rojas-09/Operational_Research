@@ -287,7 +287,7 @@ def main():
         elif opcion == 2:
             menu_floyd()
         else:
-            print("\n  Hasta luego!\n")
+            print("\nLeaving\n")
             break
 
 

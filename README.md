@@ -62,15 +62,6 @@ python -m Operational_Research
 
 ---
 
-## Technologies
-
-- Python 3
-- Graph Algorithms
-- Optimization Methods
-- Console UI
-
----
-
 ## Academic Purpose
 
 This project was developed for learning and practicing Operational Research algorithms through a modular and interactive console application.
