@@ -1,37 +1,58 @@
-class DSU:
-    # Structure for handling disjoint sets (Union-Find)
-    def __init__(self, n):
-        self.parent = list(range(n))
+class DisjointSet:
+    """
+    Union-Find / Disjoint Set structure.
 
-    def find(self, i):
-        if self.parent[i] == i:
-            return i
-        self.parent[i] = self.find(self.parent[i])
-        return self.parent[i]
+    Keeps track of connected components in a graph.
+    Useful for Kruskal's algorithm to avoid cycles.
+    """
 
-    def union(self, i, j):
-        root_i = self.find(i)
-        root_j = self.find(j)
-        if root_i != root_j:
-            self.parent[root_i] = root_j
-            return True
-        return False
-def kruskal_mst(num_nodes, edges):
+    def __init__(self, size):
+        # Each node starts as its own leader
+        self.leader = list(range(size))
 
-    # Sort edges by weight (Greedy)
-    edges.sort()
-    
-    dsu = DSU(num_nodes)
-    mst_edges = []
-    total_cost = 0
+    def get_leader(self, node):
+        """Finds the representative (leader) of a set."""
 
-    for weight, u, v in edges:
-        # If connecting u and v does not create a cycle, add the edge.
-        if dsu.union(u, v):
-            mst_edges.append((u, v, weight))
-            total_cost += weight
+        if self.leader[node] != node:
+            self.leader[node] = self.get_leader(self.leader[node])
 
-    return mst_edges, total_cost
+        return self.leader[node]
+
+    def connect_groups(self, node_a, node_b):
+        """Merges two groups if they are different."""
+
+        leader_a = self.get_leader(node_a)
+        leader_b = self.get_leader(node_b)
+
+        if leader_a == leader_b:
+            return False
+
+        self.leader[leader_a] = leader_b
+        return True
+
+
+def kruskal_mst(total_nodes, connections):
+    """
+    Kruskal's Minimum Spanning Tree algorithm.
+    """
+
+    # Sort edges from cheapest to most expensive
+    connections.sort()
+
+    groups = DisjointSet(total_nodes)
+
+    selected_edges = []
+    minimum_cost = 0
+
+    for cost, start, end in connections:
+
+        # Add edge only if it doesn't create a cycle
+        if groups.connect_groups(start, end):
+            selected_edges.append((start, end, cost))
+            minimum_cost += cost
+
+    return selected_edges, minimum_cost
+
 
 if __name__ == "__main__":
     graph_edges = [
