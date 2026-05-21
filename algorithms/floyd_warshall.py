@@ -1,12 +1,10 @@
 def floyd_warshall(number_of_nodes, weighted_edges):
     """
-    Floyd-Warshall Algorithm:
-
     Computes the shortest path between EVERY pair of nodes
     in a weighted graph.
     """
 
-    # STEP 1: Create distance matrix
+    # Create distance matrix
 
     # Infinity
     INFINITY = float("inf")
@@ -16,15 +14,15 @@ def floyd_warshall(number_of_nodes, weighted_edges):
         for _ in range(number_of_nodes)
     ]
 
-    # STEP 2: Distance from a node to itself is 0
+    # Distance from a node to itself is 0
     for node in range(number_of_nodes):
         shortest_distance[node][node] = 0
 
-    # STEP 3: Fill matrix with direct edge weights
+    # Fill matrix with direct edge weights
     for source, destination, weight in weighted_edges:
         shortest_distance[source][destination] = weight
 
-    # STEP 4: Floyd-Warshall logic
+    # Main logic
     for intermediate_node in range(number_of_nodes):
 
         for source_node in range(number_of_nodes):
@@ -50,7 +48,7 @@ def floyd_warshall(number_of_nodes, weighted_edges):
                         new_possible_distance
                     )
 
-    # STEP 5: Detect negative cycles
+    # Detect negative cycles
     for node in range(number_of_nodes):
 
         if shortest_distance[node][node] < 0:

@@ -1,7 +1,5 @@
 class DisjointSet:
     """
-    Union-Find / Disjoint Set structure.
-
     Keeps track of connected components in a graph.
     Useful for Kruskal's algorithm to avoid cycles.
     """
@@ -11,7 +9,7 @@ class DisjointSet:
         self.leader = list(range(size))
 
     def get_leader(self, node):
-        """Finds the representative (leader) of a set."""
+        """Finds the leader node of a set."""
 
         if self.leader[node] != node:
             self.leader[node] = self.get_leader(self.leader[node])
