@@ -4,8 +4,9 @@ from ui.utils import costo_total
 
 def graficar_historial(historial: list) -> None:
     """Graph the convergence of the cost over the iterations."""
-    iters  = [h["iteracion"] for h in historial]
-    costos = [h["costo"]     for h in historial]
+    # soportar historiales con claves en español e inglés
+    iters = [h.get("iteracion", h.get("iteration")) for h in historial]
+    costos = [h.get("costo", h.get("cost")) for h in historial]
 
     plt.figure(figsize=(8, 4))
     plt.plot(iters, costos, marker="o", color="steelblue", linewidth=2.5, markersize=9)
