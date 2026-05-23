@@ -146,18 +146,39 @@ def menu_graficas(costos, oferta, demanda, x_inicial, nombre_inicial, x_opt, his
         graficar_comparacion(x_inicial, x_opt, costos, label_ini=f"Inicial ({nombre_inicial})")
 
 def menu_transporte():
-    costos, oferta, demanda = cargar_problema()
+    separador("FUENTE DE DATOS")
+    fuente_idx = pedir_opcion(
+        ["Usar problema de ejemplo", "Ingresar datos manualmente"],
+        "¿Cómo quieres cargar el problema?"
+    )
+    manual = fuente_idx == 1
+
+    from transport_methods import ingresar_problema  
+    costos, oferta, demanda = ingresar_problema(manual=manual)
+
+    import pandas as pd
+    m, n = costos.shape
+    print(f"\nMatriz de costos ({m}×{n}):")
+    print(pd.DataFrame(
+        costos.astype(int),
+        index=[f"O{i+1}" for i in range(m)],
+        columns=[f"D{j+1}" for j in range(n)],
+    ).to_string())
+    print(f"\nOferta : {oferta.astype(int).tolist()}")
+    print(f"Demanda: {demanda.astype(int).tolist()}")
+
     nombre_inicial = None
-    x_inicial = None
-    x_opt = None
-    historial = []
+    x_inicial      = None
+    x_opt          = None
+    historial      = []
 
     opciones = [
-        "Calcular solucion inicial",
-        "Optimizar con Stepping Stone",
-        "Ver graficas",
-        "Resumen comparativo (los 3 metodos + optimo)",
-        "Volver",
+        "Calcular solucion inicial",          # 0
+        "Optimizar con Stepping Stone",        # 1
+        "Ver graficas",                        # 2
+        "Resumen comparativo (3 metodos + optimo)",  # 3
+        "Recargar / cambiar problema",         # 4 
+        "Volver",                              # 5
     ]
 
     while True:
@@ -185,6 +206,9 @@ def menu_transporte():
             if x_opt is not None:
                 resultados["Stepping Stone (óptimo)"] = costo_total(x_opt, costos)
             mostrar_resumen(resultados)
+        elif idx == 4:                         # Reload the problem
+            menu_transporte()                  # Recursive call cleans everything
+            return
         else:
             break
 
