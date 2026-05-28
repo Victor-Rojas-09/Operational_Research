@@ -39,7 +39,7 @@ Operational_Research/
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 Clone the repository:
 
@@ -59,9 +59,3 @@ Run the project:
 ```bash
 python -m Operational_Research
 ```
-
----
-
-## Academic Purpose
-
-This project was developed for learning and practicing Operational Research algorithms through a modular and interactive console application.
